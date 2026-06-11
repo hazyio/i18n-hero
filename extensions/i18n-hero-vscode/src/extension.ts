@@ -1,26 +1,49 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
+import { restart, start, stop } from "./server";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+  const output = vscode.window.createOutputChannel("i18n-hero");
+  context.subscriptions.push(output);
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "i18n-hero-vscode" is now active!');
+  try {
+    const result = start({ output });
+    Promise.resolve(result).catch((err) =>
+      output.appendLine(
+        `start(): failed: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`,
+      ),
+    );
+  } catch (err) {
+    output.appendLine(
+      `start(): threw: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`,
+    );
+  }
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('i18n-hero-vscode.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from i18n-hero-vscode!');
-	});
+  const disposable = vscode.commands.registerCommand(
+    "i18n-hero-vscode.restart",
+    () => {
+      try {
+        const result = restart({ output });
+        Promise.resolve(result).catch((err) =>
+          output.appendLine(
+            `restart(): failed: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`,
+          ),
+        );
+      } catch (err) {
+        output.appendLine(
+          `restart(): threw: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`,
+        );
+      }
+    },
+  );
 
-	context.subscriptions.push(disposable);
+  context.subscriptions.push(disposable);
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+  stop();
+}

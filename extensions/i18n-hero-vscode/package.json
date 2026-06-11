@@ -1,13 +1,15 @@
 {
   "name": "i18n-hero-vscode",
   "displayName": "i18n-hero-vscode",
-  "description": "",
+  "description": "Language server support for the most popular i18n libraries.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.120.0"
   },
+  "publisher": "daviddanielng",
   "categories": [
-    "Other"
+    "Other",
+    "Linters"
   ],
   "repository": "https://github.com/hazyio/i18n-hero/tree/main/extensions/i18n-hero-vscode",
   "activationEvents": [],
@@ -15,8 +17,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "i18n-hero-vscode.helloWorld",
-        "title": "Hello World"
+        "command": "i18n-hero-vscode.restart",
+        "title": "i18n-hero-vscode: Restart Extension"
       }
     ]
   },
@@ -35,15 +37,18 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.120.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
-    "typescript-eslint": "^8.56.1",
-    "eslint": "^9.39.3",
+    "@types/vscode": "^1.120.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
     "esbuild": "^0.27.3",
+    "eslint": "^9.39.3",
     "npm-run-all": "^4.1.5",
     "typescript": "^5.9.3",
-    "@vscode/test-cli": "^0.0.12",
-    "@vscode/test-electron": "^2.5.2"
+    "typescript-eslint": "^8.56.1"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^10.0.0"
   }
 }
