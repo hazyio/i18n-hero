@@ -1,5 +1,5 @@
 [package]
-name = "i18n-hero-cli"
+name = "i18n-hero"
 version = "0.1.0"
 edition = "2024"
 

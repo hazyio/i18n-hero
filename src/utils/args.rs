@@ -15,8 +15,10 @@ pub struct Args {
 pub(crate) enum StartKind {
     #[command(name = "lsp", about = "Starts lsp server")]
     Lsp {
-        #[arg(short = 'c', long = "config", help = "The config file", value_parser = validate_file, default_value = "./i18n-hero.toml")]
+        #[arg( long = "config", help = "The config file", value_parser = validate_file, default_value = "./i18n-hero.toml")]
         config: PathBuf,
+        #[arg( long = "workspace", help = "The workspace directory", value_parser = validate_dir, default_value = ".")]
+        workspace: PathBuf,
     },
     #[command(name = "init", about = "Initializes i18n-hero configuration")]
     Init {
