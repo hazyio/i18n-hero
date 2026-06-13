@@ -40,7 +40,7 @@ export function start({ output }: BaseOptions) {
   const serverOptions: ServerOptions = {
     command:
       "/home/daniel/Projects/i18n-hero/i18n-hero-cli/target/debug/i18n-hero-cli",
-    args: [],
+    args: ["lsp"],
   };
   output.append("i18n-hero lsp loading");
 
