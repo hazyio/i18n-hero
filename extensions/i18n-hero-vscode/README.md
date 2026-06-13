@@ -18,19 +18,21 @@ Supports **JSON**, **YAML**, and **TOML** translation file formats.
 
 The extension requires the `i18n-hero` CLI binary. On first activation, the extension will offer to download it automatically for your platform. Alternatively, install it manually:
 
+You must call command `Initialize i18n Hero` after installation to set up the extension.
+
 ```sh
 cargo install i18n-hero
 ```
 
 ## Extension Settings
 
-| Setting | Default | Description |
-|---|---|---|
-| `i18n-hero.enabled` | `true` | Enable or disable the extension |
-| `i18n-hero.translationFiles` | `""` | Glob pattern for translation files. Auto-detected if empty |
-| `i18n-hero.defaultLocale` | `"en"` | Locale to use as the source of truth for completions |
-| `i18n-hero.keySeparator` | `"."` | Separator used in nested keys |
-| `i18n-hero.binaryPath` | `""` | Path to the `i18n-hero` binary. Uses PATH if empty |
+| Setting                      | Default | Description                                                |
+| ---------------------------- | ------- | ---------------------------------------------------------- |
+| `i18n-hero.enabled`          | `true`  | Enable or disable the extension                            |
+| `i18n-hero.translationFiles` | `""`    | Glob pattern for translation files. Auto-detected if empty |
+| `i18n-hero.defaultLocale`    | `"en"`  | Locale to use as the source of truth for completions       |
+| `i18n-hero.keySeparator`     | `"."`   | Separator used in nested keys                              |
+| `i18n-hero.binaryPath`       | `""`    | Path to the `i18n-hero` binary. Uses PATH if empty         |
 
 ## Known Issues
 
