@@ -5,13 +5,14 @@ use crate::{
     loaders::LoadersKind,
     logger::macros::{exit_and_error, log_error},
     project::{ProjectSetting, ProjectsConfig},
+    utils::get_cwd,
 };
 
-static FILE_NAME: &str = "i18n-hero.toml";
+pub static FILE_NAME: &str = "i18n-hero.toml";
 
 pub fn collect() {
-    let dir = collect_dir("Project directory");
-    let translation_location = collect_dir("Translation Location");
+    let dir = collect_dir("Project directory", ".");
+    let translation_location = collect_dir("Translation Location", "./locales");
     let file_path = dir.join(FILE_NAME);
     if file_path.exists() {
         exit_and_error!("{} already exists at {}", FILE_NAME, file_path.display());
@@ -37,26 +38,29 @@ pub fn collect() {
         println!("Aborting.");
     }
 }
-fn collect_dir(title: &str) -> PathBuf {
+fn collect_dir(title: &str, default: &str) -> PathBuf {
     let select_dir = Input::<String>::new()
         .with_prompt(title)
-        .default(".".into())
+        .default(default.into())
         .interact_text()
         .unwrap();
 
     let valid_path = build_path(&select_dir);
     if valid_path.exists() {
         if !valid_path.is_dir() {
-            log_error!("Path is not a directory: {} ", select_dir);
-            return collect_dir(title);
+            log_error!(
+                "Path is not a directory: {} ",
+                get_cwd().join(select_dir).display()
+            );
+            return collect_dir(title, default);
         }
         return PathBuf::from(select_dir);
     } else {
         log_error!(
             "Directory does not exist: {}, path must be relative to cwd",
-            select_dir
+            get_cwd().join(select_dir).display()
         );
-        return collect_dir(title);
+        return collect_dir(title, default);
     }
 }
 fn collect_name(dir: &PathBuf) -> String {

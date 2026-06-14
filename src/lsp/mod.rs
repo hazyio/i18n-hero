@@ -9,9 +9,11 @@ use tower_lsp_server::{Client, LanguageServer, LspService, Server};
 
 use crate::lsp::completion::Completion;
 
-pub async fn start_lsp(config: PathBuf, workspace: PathBuf) {
-    let config = {
-        match crate::project::ProjectsConfig::load_from_file(&config) {
+pub async fn start_lsp(workspace: PathBuf) {
+    let workspace = {
+        match crate::project::ProjectsConfig::load_from_file(
+            &workspace.join(crate::init::FILE_NAME),
+        ) {
             Ok(cfg) => cfg,
             Err(e) => {
                 eprintln!("Failed to load config: {}", e);

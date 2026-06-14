@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use clap::Parser;
 
-use crate::loaders::LoadersKind;
+use crate::{loaders::LoadersKind, utils::get_cwd};
 
 #[derive(Parser, Debug)]
 #[command(name = "i18n-hero", about = "An lsp for i18n", long_about = None,version,about)]
@@ -18,19 +18,28 @@ pub struct Args {
 pub(crate) enum StartKind {
     #[command(name = "lsp", about = "Starts lsp server")]
     Lsp {
-        #[arg( long = "config", help = "The config file", value_parser = validate_file, default_value = "./i18n-hero.toml")]
-        config: PathBuf,
-        #[arg( long = "workspace", help = "The workspace directory", value_parser = validate_dir, default_value = ".")]
+        #[arg( long = "workspace", help = "The workspace directory", value_parser = validate_workspace, default_value = ".")]
         workspace: PathBuf,
     },
     #[command(name = "init", about = "Initializes i18n-hero configuration")]
     Init,
 }
+fn validate_workspace(s: &str) -> Result<PathBuf, String> {
+    let path = validate_dir(s)?;
+
+    let config_file = path.join("i18n-hero.toml");
+    if !config_file.exists() {
+        return Err(format!(
+            "Cannot start lsp, config file do not exists in: {}",
+            get_cwd().join(s).display()
+        ));
+    }
+    Ok(path)
+}
 
 fn validate_relative_dir(s: &str) -> Result<PathBuf, String> {
     let path = PathBuf::from(s);
-    let current_dir =
-        std::env::current_dir().map_err(|e| format!("Failed to get current directory: {}", e))?;
+    let current_dir = get_cwd();
     let valid_path = current_dir.join(&path);
     if valid_path.exists() {
         if !valid_path.is_dir() {

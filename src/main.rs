@@ -23,13 +23,10 @@ async fn main() {
         exit_and_error!("Failed to set verbose flag")
     };
     match args.start {
-        args::StartKind::Lsp { config, workspace } => {
-            // log_info!(
-            //     "Starting lsp, config {}, workspace {}",
-            //     config.display(),
-            //     workspace.display()
-            // );
-            lsp::start_lsp(config, workspace).await;
+        args::StartKind::Lsp { workspace } => {
+            println!("{}",workspace.display());
+          
+            lsp::start_lsp(workspace).await;
         }
         args::StartKind::Init => {
             init::collect();

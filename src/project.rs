@@ -8,6 +8,7 @@ pub struct ProjectSetting {
     name: String,
     root: String,
     loader: LoadersKind,
+    locales: String,
 }
 
 impl ProjectSetting {
@@ -16,6 +17,7 @@ impl ProjectSetting {
             name: name.to_string(),
             root: root.as_path().to_str().unwrap_or_default().into(),
             loader,
+            locales: translation.to_string_lossy().to_string(),
         }
     }
 }

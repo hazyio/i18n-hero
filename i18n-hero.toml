@@ -1,0 +1,5 @@
+[[project]]
+name = "i18n-hero"
+root = "."
+loader = "RustI18n"
+locales = "./locales"
