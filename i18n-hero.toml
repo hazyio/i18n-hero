@@ -1,4 +1,0 @@
-[[project]]
-name = "i18n-hero-cli"
-root = "."
-loader = "RustI18n"

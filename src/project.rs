@@ -11,17 +11,9 @@ pub struct ProjectSetting {
 }
 
 impl ProjectSetting {
-    pub fn new(name: &str, root: &PathBuf, loader: LoadersKind) -> Self {
-        let mut final_name = name.to_string();
-        if name == "my-project" || name == "my_project" {
-            if let Ok(cwd) = std::env::current_dir() {
-                if let Some(dir_name) = cwd.file_name().and_then(|s| s.to_str()) {
-                    final_name = dir_name.to_string();
-                }
-            }
-        }
+    pub fn new(name: &str, root: &PathBuf, loader: LoadersKind, translation: &PathBuf) -> Self {
         Self {
-            name: final_name,
+            name: name.to_string(),
             root: root.as_path().to_str().unwrap_or_default().into(),
             loader,
         }

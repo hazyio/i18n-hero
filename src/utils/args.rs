@@ -7,6 +7,9 @@ use crate::loaders::LoadersKind;
 #[derive(Parser, Debug)]
 #[command(name = "i18n-hero", about = "An lsp for i18n", long_about = None,version,about)]
 pub struct Args {
+    #[arg(short = 'v', long)]
+    pub verbose: bool,
+
     #[command(subcommand)]
     pub start: StartKind,
 }
@@ -21,19 +24,7 @@ pub(crate) enum StartKind {
         workspace: PathBuf,
     },
     #[command(name = "init", about = "Initializes i18n-hero configuration")]
-    Init {
-        #[arg(long = "dir", help = "Project directory, must be a relative path", value_parser = validate_relative_dir, default_value = ".")]
-        dir: PathBuf,
-        #[arg(
-            long = "loader",
-            help = "The loader to use",
-            value_enum,
-            default_value = "rust-i18n"
-        )]
-        loader: LoadersKind,
-        #[arg(long = "name", help = "Project name", default_value = "my-project")]
-        name: String,
-    },
+    Init,
 }
 
 fn validate_relative_dir(s: &str) -> Result<PathBuf, String> {
