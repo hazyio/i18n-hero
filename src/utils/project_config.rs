@@ -1,14 +1,15 @@
 use std::path::PathBuf;
 
 use crate::loaders::LoadersKind;
+use crate::utils::project::Projects;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ProjectSetting {
-    name: String,
-    root: String,
-    loader: LoadersKind,
-    locales: String,
+    pub name: String,
+    pub root: String,
+    pub loader: LoadersKind,
+    pub locales: String,
 }
 
 impl ProjectSetting {
@@ -28,10 +29,11 @@ pub struct ProjectsConfig {
 }
 
 impl ProjectsConfig {
-    pub fn load_from_file(path: &PathBuf) -> Result<Self, String> {
+    pub fn load_from_file(path: &PathBuf) -> Result<Projects, String> {
         let content = std::fs::read_to_string(path)
             .map_err(|e| format!("Failed to read config file {}: {}", path.display(), e))?;
-        toml::from_str(&content)
-            .map_err(|e| format!("Failed to parse config file {}: {}", path.display(), e))
+        let load_projects: ProjectsConfig = toml::from_str(&content)
+            .map_err(|e| format!("Failed to parse config file {}: {}", path.display(), e))?;
+        Ok(crate::utils::project::Projects::from(load_projects))
     }
 }

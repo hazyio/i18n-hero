@@ -4,9 +4,9 @@ use std::path::PathBuf;
 use crate::{
     loaders::LoadersKind,
     logger::macros::{exit_and_error, log_error},
-    project::{ProjectSetting, ProjectsConfig},
     utils::get_cwd,
 };
+use crate::utils::project_config::{ProjectSetting, ProjectsConfig};
 
 pub static FILE_NAME: &str = "i18n-hero.toml";
 

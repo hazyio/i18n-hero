@@ -9,7 +9,6 @@ use crate::{loaders::LoadersKind, utils::get_cwd};
 pub struct Args {
     #[arg(short = 'v', long)]
     pub verbose: bool,
-
     #[command(subcommand)]
     pub start: StartKind,
 }
@@ -23,6 +22,8 @@ pub(crate) enum StartKind {
     },
     #[command(name = "init", about = "Initializes i18n-hero configuration")]
     Init,
+    #[command(name = "logs", about = "Watch logs")]
+    Log,
 }
 fn validate_workspace(s: &str) -> Result<PathBuf, String> {
     let path = validate_dir(s)?;

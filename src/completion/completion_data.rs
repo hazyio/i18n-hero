@@ -1,40 +1,39 @@
-use crate::completion::completion_doc::CompletionDoc;
+use crate::completion::completion_doc::{CompletionDoc, CompletionDocData};
 use crate::lsp::quote::Quote;
 use std::collections::HashMap;
 use tower_lsp_server::ls_types::{
-    CompletionItem, CompletionItemKind, CompletionTextEdit, Documentation, Hover, HoverContents,
-    Position, Range, TextEdit,
+    CompletionItem, CompletionItemKind, CompletionTextEdit, Hover, HoverContents, Position, Range,
+    TextEdit,
 };
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 
 pub struct CompletionData {
     pub completion: String,
     pub documentation: CompletionDoc,
 }
 impl CompletionData {
-    pub fn new(completion: &str, doc: HashMap<String, String>) -> Self {
+    pub fn new(completion: &str, doc: HashMap<String, CompletionDocData>) -> Self {
         CompletionData {
-            // compare: completion.to_lowercase(),
             completion: String::from(completion),
             documentation: CompletionDoc::new(doc),
         }
     }
-    pub fn get_hover(&self, quote: &Quote, position: Position) -> Hover {
+    pub fn get_hover(&self, quote: &Quote, available_locales: &Vec<String>) -> Hover {
         Hover {
-            contents: HoverContents::Markup(self.documentation.get_markup()),
+            contents: HoverContents::Markup(self.documentation.get_markup(quote.text.as_str(),available_locales)),
             range: Some(Range {
                 start: Position {
-                    line: position.line,
+                    line: quote.position.line,
                     character: quote.start + 1, // add quote
                 },
                 end: Position {
-                    line: position.line,
-                    character: position.character,
+                    line: quote.position.line,
+                    character: quote.position.character,
                 },
             }),
         }
     }
-    pub fn get_completion(&self, quote: &Quote, position: Position) -> CompletionItem {
+    pub fn get_completion(&self, quote: &Quote, available_locales: &Vec<String>) -> CompletionItem {
         let new_text = {
             let mut d = self.completion.clone();
             if !quote.complete {
@@ -50,17 +49,17 @@ impl CompletionData {
             text_edit: Some(CompletionTextEdit::Edit(TextEdit {
                 range: Range {
                     start: Position {
-                        line: position.line,
+                        line: quote.position.line,
                         character: quote.start + 1, // add quote
                     },
                     end: Position {
-                        line: position.line,
-                        character: position.character,
+                        line: quote.position.line,
+                        character: quote.position.character,
                     },
                 },
                 new_text: new_text,
             })),
-            documentation: Some(self.documentation.get_md_doc()),
+            documentation: Some(self.documentation.get_md_doc(quote.text.as_str(),available_locales)),
             ..CompletionItem::default()
         }
     }
