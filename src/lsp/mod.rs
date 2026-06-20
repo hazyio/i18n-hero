@@ -1,4 +1,5 @@
 mod misc;
+pub mod quote;
 
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -11,7 +12,6 @@ use tower_lsp_server::{Client, LanguageServer, LspService, Server};
 use crate::completion::completion::Completion;
 use crate::completion::completion_data::CompletionData;
 use crate::logger::macros::exit_and_error;
-use crate::lsp::misc::get_quote_string;
 
 pub async fn start_lsp(workspace: PathBuf) {
     let projects = {
@@ -43,20 +43,28 @@ struct Backend {
 impl Backend {
     pub async fn get_completion_line(
         &self,
-        line: &str,
-        character: u32,
+        params: CompletionParams,
     ) -> Option<CompletionResponse> {
-        match get_quote_string(line, character) {
-            None => {
-                return None;
-            }
-            Some(quote) => {
-                // self.client
-                //     .log_message(MessageType::INFO, format!("hover: {:?}", string))
-                //     .await;
-                self.state.read().await.get_completions(quote).await
-            }
+        let uri = params.text_document_position.text_document.uri;
+        let position = params.text_document_position.position;
+        let documents = self.documents.read().await;
+        let text = documents.get(&uri).cloned().unwrap_or_default();
+        if let Some(line) = text.lines().nth(position.line as usize) {
+            let quote = quote::Quote::from_line(line, position.character);
+
+            return match quote {
+                None => None,
+                Some(quote) => {
+                    return self
+                        .state
+                        .read()
+                        .await
+                        .get_completions(quote, position, &self.client)
+                        .await;
+                }
+            };
         }
+        None
     }
 }
 impl LanguageServer for Backend {
@@ -86,43 +94,27 @@ impl LanguageServer for Backend {
             .add_completion(CompletionData::new("hello.world", d));
     }
     async fn completion(&self, params: CompletionParams) -> Result<Option<CompletionResponse>> {
-        let uri = params.text_document_position.text_document.uri;
-        let position = params.text_document_position.position;
-        let documents = self.documents.read().await;
-        let text = documents.get(&uri).cloned().unwrap_or_default();
-        if let Some(line) = text.lines().nth(position.line as usize) {
-            return Ok(self.get_completion_line(line, position.character).await);
+        // return  self.get_completion_line(&params);
+        if let Some(data) = self.get_completion_line(params).await {
+            return Ok(Some(data));
         };
         Ok(None)
-        // match {
-        //     None => Ok(None),
-        //     Some(line) => {
-        //         self.client
-        //             .log_message(MessageType::INFO, format!("completion: {:?}", line))
-        //             .await;
-        //         let c = self.state.read().await;
-        //         let completions = c.get_all_completions();
-        //         let items: Vec<CompletionItem> = completions
-        //             .iter()
-        //             .map(|data| CompletionItem {
-        //                 label: data.completion.clone(),
-        //                 kind: Some(CompletionItemKind::TEXT),
-        //                 detail: Some(data.hover.clone()),
-        //                 ..CompletionItem::default()
-        //             })
-        //             .collect();
-        //         Ok(Some(CompletionResponse::Array(items)))
-        //     }
-        // }
     }
 
     async fn shutdown(&self) -> Result<()> {
         Ok(())
     }
     async fn hover(&self, params: HoverParams) -> Result<Option<Hover>> {
-        // self.client
-        //     .log_message(MessageType::INFO, format!("hover: {:?}", params))
-        //     .await;
+        let uri = params.text_document_position_params.text_document.uri;
+        let position = params.text_document_position_params.position;
+        let documents = self.documents.read().await;
+        let text = documents.get(&uri).cloned().unwrap_or_default();
+        if let Some(line) = text.lines().nth(position.line as usize) {
+            if let Some(quote) = quote::Quote::from_line(line, position.character) {
+                return Ok(self.state.read().await.get_hover(&quote, position));
+            }
+        }
+
         Ok(None)
     }
     async fn did_open(&self, params: DidOpenTextDocumentParams) {

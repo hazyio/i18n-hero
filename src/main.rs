@@ -4,13 +4,13 @@ use clap::Parser;
 
 use crate::{logger::macros::exit_and_error, utils::args};
 
+pub mod completion;
 pub(crate) mod init;
 pub(crate) mod loaders;
 pub(crate) mod logger;
 pub(crate) mod lsp;
 pub(crate) mod project;
 pub(crate) mod utils;
-pub mod completion;
 
 static VERBOSE: OnceLock<bool> = OnceLock::new();
 #[tokio::main]
